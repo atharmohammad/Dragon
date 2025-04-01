@@ -1,0 +1,39 @@
+/**
+ * Dragon: "Tools for trading and analysis".
+ * Currently in active development and experimentation phase 
+ *
+ * 1. A Mev analysis dashboard
+ * Index Swap transaction and check for sandwich attacks
+ * 
+ * Routes:
+ * - real time subscription endpoint for sandwich updates
+ * 
+ *
+ * 2. A user friendly but high speed dex aggregator (Cheaper or Equal algorithm to Jup/Titan in V1) providing swaps really low/without fees with(maybe) subscription model or some other way of monetization
+ * Additional features that can improve:
+ * Buy/Sell crypto on the dex directly from fiat. 
+ *
+ * Routes:
+ *  - list of supported tokens
+ *  - quote: quote amount for the converted token from base token
+ *  - swap: creates swap transaction as per arguments
+ *  
+ * if subscription:
+ * - login/register flow
+ * - authentication 
+ * 
+ * Things to figure out: 
+ * - Find best algorithm for getting the best route for swap.
+ * 
+ * 
+ * Dexes to get quote from:
+ * - Jup
+ * - Raydium
+ * - Orca
+ * 
+ * -- First top 3
+ * 
+ * 
+ * - Kamino
+ * - 
+ **/
