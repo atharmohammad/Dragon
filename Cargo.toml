@@ -14,3 +14,6 @@ solana-sdk="^2.2.2"
 helius="0.2.5"
 derive_more = { version = "2", features = ["from"] }
 
+
+[dev-dependencies]
+anyhow="^1"

@@ -18,7 +18,7 @@ pub struct HeliusWebhookClient {
 impl HeliusWebhookClient {
     pub fn new() -> Result<Self> {
         let config = config();
-        let helius = Helius::new(&config.RPC_ENDPOINT, helius::types::Cluster::Devnet)?;
+        let helius = Helius::new(&config.HELIUS_API_KEY, helius::types::Cluster::Devnet)?;
 
         Ok(HeliusWebhookClient {
             rpc: helius,
@@ -31,9 +31,9 @@ impl HeliusWebhookClient {
         Ok(webhook)
     }
 
-    pub async fn create_webhook(self: &mut Self, webhook_url: String) -> Result<Webhook> {
+    pub async fn create_webhook(self: &mut Self, webhook_url: &str) -> Result<Webhook> {
         let request = CreateWebhookRequest {
-            webhook_url,
+            webhook_url: webhook_url.to_string(),
             transaction_types: Vec::from([TransactionType::Swap]),
             account_addresses: Vec::new(),
             webhook_type: WebhookType::EnhancedDevnet,
@@ -82,4 +82,33 @@ pub async fn index() -> Result<()> {
      * 3. implement a sliding window search
      */
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use anyhow::Result;
+
+    use super::HeliusWebhookClient;
+
+    #[test]
+    fn test_initialize_webhook_client_ok() -> Result<()> {
+        let res = HeliusWebhookClient::new();
+        assert!(res.is_ok());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_create_webhook_ok() -> Result<()> {
+        let mut client = HeliusWebhookClient::new()?;
+        let fx_webhook_url = "https://localhost:3005/helius/test";
+        let res = client.create_webhook(fx_webhook_url).await;
+
+        assert!(res.is_ok());
+        let webhook = res?;
+        assert_eq!(webhook.webhook_url, fx_webhook_url);
+        //todo: delete webhook
+
+        Ok(())
+    }
 }

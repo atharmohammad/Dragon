@@ -3,8 +3,9 @@ use std::{env::var, sync::OnceLock};
 use crate::error::{Error, Result};
 
 #[allow(non_snake_case)]
+#[derive(Debug)]
 pub struct Config {
-    pub RPC_ENDPOINT: String,
+    pub HELIUS_API_KEY: String,
 }
 
 pub fn config() -> &'static Config {
@@ -16,7 +17,7 @@ pub fn config() -> &'static Config {
 
 fn init_config() -> Result<Config> {
     Ok(Config {
-        RPC_ENDPOINT: get_env("SERVICE_RPC_ENDPOINT")?,
+        HELIUS_API_KEY: get_env("SERVICE_HELIUS_API_KEY")?,
     })
 }
 

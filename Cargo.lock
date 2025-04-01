@@ -1235,6 +1235,7 @@ dependencies = [
 name = "dragon"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "derive_more",
  "helius",
