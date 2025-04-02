@@ -53,6 +53,8 @@ pub async fn create_webhook_hanlder(
 
 #[cfg(test)]
 mod test {
+    use std::env;
+
     use anyhow::Result;
     use tokio::{fs, io::AsyncReadExt};
 
@@ -60,9 +62,10 @@ mod test {
 
     #[tokio::test]
     async fn test_parse_webhook_transaction_payload_ok() -> Result<()> {
-        let mut file =
-            fs::File::open("/Users/athar/Desktop/workspace/dragon/examples/raydium-swap.json")
-                .await?;
+        let current_dir = env::current_dir()?;
+        let file_path = current_dir.join("./examples/raydium-swap.json");
+
+        let mut file = fs::File::open(file_path).await?;
         let mut contents = String::new();
         file.read_to_string(&mut contents).await?;
 
