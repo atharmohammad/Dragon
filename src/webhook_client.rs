@@ -1,18 +1,21 @@
 use crate::{
     config::config,
     error::{Error, Result},
+    watch_list::TargetPool,
 };
 use helius::{
     Helius,
     types::{
-        AccountWebhookEncoding, CreateWebhookRequest, EditWebhookRequest, TransactionStatus,
-        TransactionType, Webhook, WebhookType,
+        AccountWebhookEncoding, CreateWebhookRequest, EditWebhookRequest, HeliusEndpoints,
+        TransactionStatus, TransactionType, Webhook, WebhookType,
     },
 };
+use reqwest::{Method, Url};
 
 pub struct HeliusWebhookClient {
-    pub rpc: Helius,
+    pub helius: Helius,
     pub webhook_id: Option<String>,
+    pub base_url: String,
 }
 
 impl HeliusWebhookClient {
@@ -21,31 +24,79 @@ impl HeliusWebhookClient {
         let helius = Helius::new(&config.HELIUS_API_KEY, helius::types::Cluster::Devnet)?;
 
         Ok(HeliusWebhookClient {
-            rpc: helius,
+            base_url: String::from("https://api.helius.xyz"), // Api prefix for webhooks, incorrect in helius sdk.
+            helius,
             webhook_id: None,
         })
     }
 
     pub async fn get_webhook_by_id(self: &Self, id: &str) -> Result<Webhook> {
-        let webhook = self.rpc.get_webhook_by_id(id).await?;
+        let webhook_id = self.webhook_id.as_ref().ok_or(Error::WebhookIdMissing)?;
+        let url: String = format!(
+            "{}/v0/webhooks/{}?api-key={}",
+            self.base_url, webhook_id, self.helius.config.api_key
+        );
+        let parsed_url: Url = Url::parse(&url).expect("Failed to parse URL");
+
+        let webhook = self
+            .helius
+            .rpc_client
+            .handler
+            .send::<_, Webhook>(Method::GET, parsed_url, None::<&()>)
+            .await?;
         Ok(webhook)
     }
 
     pub async fn create_webhook(self: &mut Self, webhook_url: &str) -> Result<Webhook> {
+        let watch_list = TargetPool::new()?;
+        let account_addresses: Vec<String> = watch_list
+            .iter()
+            .map(|pool| pool.address.to_string())
+            .collect();
+
         let request = CreateWebhookRequest {
             webhook_url: webhook_url.to_string(),
             transaction_types: Vec::from([TransactionType::Swap]),
-            account_addresses: Vec::new(),
+            account_addresses,
             webhook_type: WebhookType::EnhancedDevnet,
             txn_status: TransactionStatus::Success,
             auth_header: None, // todo: add auth header
             encoding: AccountWebhookEncoding::JsonParsed,
         };
 
-        let webhook = self.rpc.create_webhook(request).await?;
+        let url: String = format!(
+            "{}/v0/webhooks?api-key={}",
+            self.base_url, self.helius.config.api_key
+        );
+        let parsed_url: Url = Url::parse(&url).expect("Failed to parse URL");
+
+        let webhook = self
+            .helius
+            .rpc_client
+            .handler
+            .send::<_, Webhook>(Method::POST, parsed_url, Some(&request))
+            .await?;
         self.webhook_id = Some(webhook.webhook_id.clone());
 
         Ok(webhook)
+    }
+
+    pub async fn delete_webhook(self: &mut Self) -> Result<()> {
+        let webhook_id = self.webhook_id.as_ref().ok_or(Error::WebhookIdMissing)?;
+        let url: String = format!(
+            "{}/v0/webhooks/{}?api-key={}",
+            self.base_url, webhook_id, self.helius.config.api_key
+        );
+        let parsed_url: Url = Url::parse(&url).expect("Failed to parse URL");
+
+        self.helius
+            .rpc_client
+            .handler
+            .send::<_, ()>(Method::DELETE, parsed_url, None::<&()>)
+            .await?;
+        self.webhook_id = None;
+
+        Ok(())
     }
 
     pub async fn subscribe(self: &Self, address: String) -> Result<()> {
@@ -64,8 +115,17 @@ impl HeliusWebhookClient {
             txn_status: webhook.txn_status,
             encoding: webhook.encoding,
         };
-        self.rpc.edit_webhook(request).await?;
+        let url: String = format!(
+            "{}v0/webhooks/{}?api-key={}",
+            self.base_url, request.webhook_id, self.helius.config.api_key
+        );
+        let parsed_url: Url = Url::parse(&url).expect("Failed to parse URL");
 
+        self.helius
+            .rpc_client
+            .handler
+            .send::<_, Webhook>(Method::PUT, parsed_url, Some(&request))
+            .await?;
         Ok(())
     }
 }
@@ -99,15 +159,15 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_create_webhook_ok() -> Result<()> {
+    async fn test_create_and_delete_webhook_ok() -> Result<()> {
         let mut client = HeliusWebhookClient::new()?;
-        let fx_webhook_url = "https://localhost:3005/helius/test";
+        let fx_webhook_url = "http://localhost:3005/helius/test";
         let res = client.create_webhook(fx_webhook_url).await;
 
         assert!(res.is_ok());
         let webhook = res?;
         assert_eq!(webhook.webhook_url, fx_webhook_url);
-        //todo: delete webhook
+        client.delete_webhook().await?;
 
         Ok(())
     }
