@@ -6,6 +6,8 @@ use crate::error::{Error, Result};
 #[derive(Debug)]
 pub struct Config {
     pub HELIUS_API_KEY: String,
+    pub WEB_FOLDER: String,
+    pub WEBHOOK_ID: Option<String>,
 }
 
 pub fn config() -> &'static Config {
@@ -18,9 +20,15 @@ pub fn config() -> &'static Config {
 fn init_config() -> Result<Config> {
     Ok(Config {
         HELIUS_API_KEY: get_env("SERVICE_HELIUS_API_KEY")?,
+        WEB_FOLDER: String::from("public"),
+        WEBHOOK_ID: get_optional_env("SERVICE_WEBHOOK_ID"),
     })
 }
 
 fn get_env(name: &'static str) -> Result<String> {
     var(name).map_err(|_| Error::ConfigEnvMissing(name))
+}
+
+fn get_optional_env(name: &str) -> Option<String> {
+    var(name).ok()
 }

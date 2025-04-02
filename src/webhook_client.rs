@@ -1,8 +1,11 @@
+use std::{cell::RefCell, sync::Arc};
+
 use crate::{
     config::config,
     error::{Error, Result},
     watch_list::TargetPool,
 };
+use axum::{Json, extract::State, response::IntoResponse};
 use helius::{
     Helius,
     types::{
@@ -11,11 +14,12 @@ use helius::{
     },
 };
 use reqwest::{Method, Url};
+use serde_json::Value;
 
 pub struct HeliusWebhookClient {
     pub helius: Helius,
-    pub webhook_id: Option<String>,
     pub base_url: String,
+    pub webhook_id: Option<String>,
 }
 
 impl HeliusWebhookClient {
@@ -26,7 +30,7 @@ impl HeliusWebhookClient {
         Ok(HeliusWebhookClient {
             base_url: String::from("https://api.helius.xyz"), // Api prefix for webhooks, incorrect in helius sdk.
             helius,
-            webhook_id: None,
+            webhook_id: config.WEBHOOK_ID.clone(),
         })
     }
 
@@ -47,7 +51,7 @@ impl HeliusWebhookClient {
         Ok(webhook)
     }
 
-    pub async fn create_webhook(self: &mut Self, webhook_url: &str) -> Result<Webhook> {
+    pub async fn create_webhook(self: &Self, webhook_url: &str) -> Result<Webhook> {
         let watch_list = TargetPool::new()?;
         let account_addresses: Vec<String> = watch_list
             .iter()
@@ -76,12 +80,11 @@ impl HeliusWebhookClient {
             .handler
             .send::<_, Webhook>(Method::POST, parsed_url, Some(&request))
             .await?;
-        self.webhook_id = Some(webhook.webhook_id.clone());
 
         Ok(webhook)
     }
 
-    pub async fn delete_webhook(self: &mut Self) -> Result<()> {
+    pub async fn delete_webhook(self: &Self) -> Result<()> {
         let webhook_id = self.webhook_id.as_ref().ok_or(Error::WebhookIdMissing)?;
         let url: String = format!(
             "{}/v0/webhooks/{}?api-key={}",
@@ -94,7 +97,6 @@ impl HeliusWebhookClient {
             .handler
             .send::<_, ()>(Method::DELETE, parsed_url, None::<&()>)
             .await?;
-        self.webhook_id = None;
 
         Ok(())
     }
@@ -128,20 +130,6 @@ impl HeliusWebhookClient {
             .await?;
         Ok(())
     }
-}
-
-pub async fn index() -> Result<()> {
-    let config = config();
-    // TODO: Safely handle errors
-
-    /*
-     * Use helius webhooks to listen to swaps, and then look for tx before and after it.
-     *
-     * 1. filter the swap tx
-     * 2. map txs to their blocks
-     * 3. implement a sliding window search
-     */
-    Ok(())
 }
 
 #[cfg(test)]

@@ -1241,6 +1241,7 @@ dependencies = [
  "helius",
  "reqwest",
  "serde",
+ "serde_json",
  "solana-sdk",
  "tokio",
  "tower-cookies",
