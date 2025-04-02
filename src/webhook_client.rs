@@ -62,7 +62,7 @@ impl HeliusWebhookClient {
             webhook_url: webhook_url.to_string(),
             transaction_types: Vec::from([TransactionType::Swap]),
             account_addresses,
-            webhook_type: WebhookType::EnhancedDevnet,
+            webhook_type: WebhookType::Raw,
             txn_status: TransactionStatus::Success,
             auth_header: None, // todo: add auth header
             encoding: AccountWebhookEncoding::JsonParsed,

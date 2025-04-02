@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::{
     config::config,
     error::{Error, Result},
+    types::WebhookTransactionPayload,
 };
 use axum::{
     Json,
@@ -18,11 +19,10 @@ use crate::webhook_client::HeliusWebhookClient;
 #[axum::debug_handler]
 pub async fn index(
     State(webhook_client): State<Arc<HeliusWebhookClient>>,
-    Json(payload): Json<Value>,
+    Json(payload): Json<Vec<WebhookTransactionPayload>>,
 ) -> Result<impl IntoResponse> {
     let config = config();
-    // TODO: Safely handle errors
-    println!("received payload: {}", payload);
+    println!("{:?}", payload);
 
     /*
      * Use helius webhooks to listen to swaps, and then look for tx before and after it.
@@ -49,4 +49,27 @@ pub async fn create_webhook_hanlder(
     Ok(Json(json!({
         "webhook": webhook
     })))
+}
+
+#[cfg(test)]
+mod test {
+    use anyhow::Result;
+    use tokio::{fs, io::AsyncReadExt};
+
+    use crate::{error::Error, types::WebhookTransactionPayload};
+
+    #[tokio::test]
+    async fn test_parse_webhook_transaction_payload_ok() -> Result<()> {
+        let mut file =
+            fs::File::open("/Users/athar/Desktop/workspace/dragon/examples/raydium-swap.json")
+                .await?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).await?;
+
+        let data = serde_json::from_str::<Vec<WebhookTransactionPayload>>(&contents);
+        dbg!("{}", &data);
+        assert!(data.is_ok());
+
+        Ok(())
+    }
 }

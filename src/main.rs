@@ -13,6 +13,7 @@ use webhook_client::HeliusWebhookClient;
 mod config;
 mod error;
 mod routes;
+mod types;
 mod watch_list;
 mod web;
 mod webhook_client;
