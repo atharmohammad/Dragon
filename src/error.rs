@@ -19,6 +19,10 @@ pub enum Error {
     #[from]
     Helius(helius::error::HeliusError),
 
+    // -- Helius Error
+    #[from]
+    Sqlx(sqlx::error::Error),
+
     // -- Config Errors
     ConfigEnvMissing(&'static str),
 }

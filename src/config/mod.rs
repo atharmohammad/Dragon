@@ -8,6 +8,7 @@ pub struct Config {
     pub HELIUS_API_KEY: String,
     pub WEB_FOLDER: String,
     pub WEBHOOK_ID: Option<String>,
+    pub DB_URL: String,
 }
 
 pub fn config() -> &'static Config {
@@ -22,6 +23,7 @@ fn init_config() -> Result<Config> {
         HELIUS_API_KEY: get_env("SERVICE_HELIUS_API_KEY")?,
         WEB_FOLDER: String::from("public"),
         WEBHOOK_ID: get_optional_env("SERVICE_WEBHOOK_ID"),
+        DB_URL: get_env("SERVICE_DB_URL")?,
     })
 }
 
