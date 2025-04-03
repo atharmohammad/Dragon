@@ -1,8 +1,9 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::{
     config::config,
     error::{Error, Result},
+    indexer::webhook_client::HeliusWebhookClient,
     types::WebhookTransactionPayload,
 };
 use axum::{
@@ -13,8 +14,6 @@ use axum::{
 use serde::Deserialize;
 use serde_json::{Value, json};
 use tokio::sync::Mutex;
-
-use crate::webhook_client::HeliusWebhookClient;
 
 #[axum::debug_handler]
 pub async fn index(
@@ -31,6 +30,12 @@ pub async fn index(
      * 2. map txs to their blocks
      * 3. implement a sliding window search
      */
+    let payload_buffer: Vec<WebhookTransactionPayload> = Vec::new();
+    for tx in payload {
+        let mut block_tx_map: HashMap<i64, WebhookTransactionPayload> = HashMap::new();
+        block_tx_map.insert(tx.block_time, tx);
+    }
+
     Ok(())
 }
 
@@ -70,7 +75,7 @@ mod test {
         file.read_to_string(&mut contents).await?;
 
         let data = serde_json::from_str::<Vec<WebhookTransactionPayload>>(&contents);
-        dbg!("{}", &data);
+        // dbg!("{}", &data);
         assert!(data.is_ok());
 
         Ok(())

@@ -3,56 +3,58 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WebhookTransactionPayload {
-    slot: i32,
-    block_time: i64,
-    index_within_block: i32,
-    meta: TransactionMeta,
-    transaction: Transaction,
+    pub slot: i32,
+    pub block_time: i64,
+    pub index_within_block: i32,
+    pub meta: TransactionMeta,
+    pub transaction: Transaction,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionMeta {
-    pre_token_balances: Vec<TokenBalance>,
-    post_token_balances: Vec<TokenBalance>,
+    pub pre_balances: Vec<i64>,
+    pub post_balances: Vec<i64>,
+    pub pre_token_balances: Vec<TokenBalance>,
+    pub post_token_balances: Vec<TokenBalance>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
-    message: TransactionMessage,
-    signatures: Vec<String>,
+    pub message: TransactionMessage,
+    pub signatures: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionMessage {
-    account_keys: Vec<String>,
-    instructions: Vec<Instruction>,
-    recent_blockhash: String,
+    pub account_keys: Vec<String>,
+    pub instructions: Vec<Instruction>,
+    pub recent_blockhash: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Instruction {
-    accounts: Vec<usize>,
-    data: String,
-    program_id_index: usize,
+    pub accounts: Vec<usize>,
+    pub data: String,
+    pub program_id_index: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TokenBalance {
-    account_index: usize,
-    mint: String,
-    owner: String,
-    program_id: String,
-    ui_token_amount: UiTokenAmount,
+    pub account_index: usize,
+    pub mint: String,
+    pub owner: String,
+    pub program_id: String,
+    pub ui_token_amount: UiTokenAmount,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UiTokenAmount {
-    amount: String,
-    decimals: u8,
+    pub amount: String,
+    pub decimals: u8,
 }

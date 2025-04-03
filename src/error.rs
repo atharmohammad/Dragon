@@ -4,20 +4,19 @@ use std::sync::Arc;
 use axum::{http::StatusCode, response::IntoResponse};
 use derive_more::From;
 
+use crate::indexer;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[allow(non_snake_case)]
 #[derive(Debug, From)]
 pub enum Error {
-    WebhookIdMissing,
-
-    // -- Mutex Error
     #[from]
     Mutex(String),
 
     // -- Helius Error
     #[from]
-    Helius(helius::error::HeliusError),
+    Indexer(indexer::error::Error),
 
     // -- Helius Error
     #[from]

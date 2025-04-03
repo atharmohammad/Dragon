@@ -2,21 +2,21 @@
 mod config;
 mod db;
 mod error;
+mod indexer;
 mod routes;
 mod types;
 mod watch_list;
 mod web;
-mod webhook_client;
 
 use axum::{
     Router,
     routing::{get, post},
 };
+use indexer::webhook_client::HeliusWebhookClient;
 use routes::static_routes;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use web::{create_webhook_hanlder, index};
-use webhook_client::HeliusWebhookClient;
 
 #[tokio::main]
 async fn main() {

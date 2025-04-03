@@ -2,7 +2,7 @@ use std::{cell::RefCell, sync::Arc};
 
 use crate::{
     config::config,
-    error::{Error, Result},
+    indexer::error::{Error, Result},
     watch_list::TargetPool,
 };
 use axum::{Json, extract::State, response::IntoResponse};
