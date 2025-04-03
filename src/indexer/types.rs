@@ -58,3 +58,8 @@ pub struct UiTokenAmount {
     pub amount: String,
     pub decimals: u8,
 }
+
+pub struct SandwichAttackVector {
+    pub frontrun_tx: WebhookTransactionPayload,
+    pub backrun_tx: WebhookTransactionPayload,
+}

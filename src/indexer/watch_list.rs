@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::indexer::error::{Error, Result};
 use solana_sdk::{pubkey, pubkey::Pubkey};
 
 #[derive(Debug)]

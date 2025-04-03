@@ -1,9 +1,7 @@
-use std::{cell::RefCell, sync::Arc};
-
+use super::watch_list::TargetPool;
 use crate::{
     config::config,
     indexer::error::{Error, Result},
-    watch_list::TargetPool,
 };
 use axum::{Json, extract::State, response::IntoResponse};
 use helius::{
@@ -15,6 +13,7 @@ use helius::{
 };
 use reqwest::{Method, Url};
 use serde_json::Value;
+use std::{cell::RefCell, sync::Arc};
 
 pub struct HeliusWebhookClient {
     pub helius: Helius,

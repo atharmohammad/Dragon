@@ -1,7 +1,8 @@
 use crate::indexer::error::{Error, Result};
-use crate::types::WebhookTransactionPayload;
 use solana_sdk::{program_memory::sol_memcmp, pubkey::Pubkey};
 use std::str::FromStr;
+
+use super::types::WebhookTransactionPayload;
 
 pub fn filter_target_token_data_from_tx(
     target_token_account: &str,

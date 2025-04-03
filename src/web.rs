@@ -3,8 +3,7 @@ use std::{collections::HashMap, sync::Arc};
 use crate::{
     config::config,
     error::{Error, Result},
-    indexer::webhook_client::HeliusWebhookClient,
-    types::WebhookTransactionPayload,
+    indexer::{types::WebhookTransactionPayload, webhook_client::HeliusWebhookClient},
 };
 use axum::{
     Json,
@@ -63,7 +62,7 @@ mod test {
     use anyhow::Result;
     use tokio::{fs, io::AsyncReadExt};
 
-    use crate::{error::Error, types::WebhookTransactionPayload};
+    use crate::{error::Error, indexer::types::WebhookTransactionPayload};
 
     #[tokio::test]
     async fn test_parse_webhook_transaction_payload_ok() -> Result<()> {
