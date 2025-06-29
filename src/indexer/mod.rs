@@ -165,6 +165,14 @@ impl Indexer {
         })
     }
 
+    /**
+     * Todo: 
+     * 1. Find the instruction or inner instruction that contains swap.
+     * 2. Parse full instruction as per the AMM
+     * 3. Check mev in that
+     * 
+     */
+
     pub fn check_mev(
         &self,
         transactions: &[ProcessedTransaction; 3],
