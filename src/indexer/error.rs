@@ -9,12 +9,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[allow(non_snake_case)]
 #[derive(Debug, From)]
 pub enum Error {
-    WebhookIdMissing,
     FailedToIndexInBlockTxMapVector,
     FailedToParseInput,
-    // -- Helius Error
-    #[from]
-    Helius(helius::error::HeliusError),
+    NumericalOverflow,
+    TransactionNotFromTargetPools,
+    Custom(&'static str),
 }
 
 impl fmt::Display for Error {
